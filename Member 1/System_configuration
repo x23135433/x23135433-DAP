@@ -1,1 +1,67 @@
+The system should have below requirements:
+1. Running instance of Docker
+2. PgAdmin
+3. MongoDB compass
+4.Creating etl directory with below yml
+name: etl
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pandas
+  - dagster
+  - dagster-pandas
+  - dagit
+  - pymongo
+  - psycopg2
+  - sqlalchemy=1.4
+5.Creating MongoDB directory with yml-
+version: "3.8"
+services:
+    mongodb:
+      image: mongo
+      container_name: mongodb
+      environment:
+            MONGO_INITDB_ROOT_USERNAME: dap
+            MONGO_INITDB_ROOT_PASSWORD: dap
+            MONGO_INITDB_DATABASE: dap
+      ports:
+            - 27017-27019:27017-27019
+      volumes:
+            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      restart: unless-stopped
+6.In MongoDB directory creating java script file with .js extension
+db.createUser(
+        {
+            user: "dap",
+            pwd: "dap",
+            roles: [
+                {
+                    role: "readWrite",
+                    db: "dap"
+                }
+            ]
+        }
+);
 
+7.Create PossgreSQL directory with below yml file
+version: "3"
+services:
+  database:
+    image: "postgres:16.1"
+    ports:
+      - "5432:5432"
+    env_file:
+      - postgresql.env.txt
+    volumes:
+      - dbdata:/var/lib/postgresql/data/
+
+volumes:
+  dbdata:
+8.In postgresql directory create below .env file
+POSTGRES_USER=dap
+POSTGRES_PASSWORD=dap
+POSTGRES_DB=postgres
+9. Activate the etl enviroment using conda activate command
+10.Place the python scripts in the project directory
+11.Execute etl.py script using daggit command
